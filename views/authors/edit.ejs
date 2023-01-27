@@ -1,0 +1,19 @@
+<% layout('layouts/boilerplate') %>
+
+    <!-- <h2>Edit Author</h2>
+    <form action="/authors/%= author.id %>?_method=PUT" method="POST"> -->
+    <!-- %- include('_form_fields') %> -->
+    <!-- <a href="/authors/%= author.id %>">Cancel</a> -->
+    <!-- <button type="submit">Update</button>
+    </form> -->
+
+
+    <h2>Edit Author</h2>
+
+    <form action="/authors/<%= author.id %>?_method=PUT" method="POST">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" value="<%= author.name %>">
+        <button>Edit</button>
+    </form>
+
+    <a href="/authors/<%= author.id %> %>">Back</a>

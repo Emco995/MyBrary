@@ -1,0 +1,11 @@
+<% layout('layouts/boilerplate') %>
+
+    <h2>New Book</h2>
+
+    <form action="/books" method="POST">
+        <%- include('_form_fields.ejs') %>
+
+            <button type="submit">Create</button>
+
+            <a href="/books">Cancel</a>
+    </form>
