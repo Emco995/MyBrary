@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Author = require("../models/author");
+const Book = require("../models/book");
 
 ///////////All authors route
 
@@ -43,11 +44,22 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const author = await Author.findById(id);
-  res.render("authors/show", { author });
-  //   res.send("Show author id" + req.params.id);
+  try {
+    const { id } = req.params;
+    const author = await Author.findById(id);
+    // const author = await Author.findById(id).populate("books", 'coverImage);
+    const books = await Book.find({ author: author.id }).limit(6).exec();
+    res.render("authors/show", { author: author, booksByAuthor: books });
+  } catch {
+    res.redirect("/");
+  }
 });
+
+// router.get("/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const author = await Author.findById(id);
+//   res.render("authors/show", { author });
+// });
 
 router.get("/:id/edit", async (req, res) => {
   try {
@@ -57,40 +69,77 @@ router.get("/:id/edit", async (req, res) => {
   } catch {
     res.redirect("/authors");
   }
-  //   res.send("Edit author id " + req.params.id);
 });
 
 router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const author = await Author.findByIdAndUpdate(id, req.body, {
-    runValidators: true,
-  });
-  res.redirect(`/authors/${author.id}`);
-  //   res.send("Update author id " + req.params.id);
+  let author;
+  try {
+    const { id } = req.params;
+    author = await Author.findByIdAndUpdate(id, req.body, {
+      runValidators: true,
+    });
+    res.redirect(`/authors/${author.id}`);
+  } catch {
+    if (author == null) {
+      res.redirect(`/`);
+    } else {
+      let locals = { errorMessage: `Error updating Author` };
+      res.render("author/edit", {
+        author: author,
+        locals: locals,
+      });
+    }
+    res.redirect(`/authors`);
+  }
 });
-
-// router.put('/:id', async (req, res) => {
-//     let author
-//     try {
-//         author = await Author.findById(req.params.id)
-//         author.name = req.body.name
-//         await author.save()
-//         res.redirect(`/authors/${author.id}`)
-//     } catch (err) {
-//         if (author == null) {
-//             res.redirect('/');
-//         } else {
-//             let locals = { errorMessage: `Error updating Author` }
-//             res.render('authors/edit', {
-//                 author: author,
-//                 locals: locals
-//             });
-//         }
-//     }
-// })
 
 router.delete("/:id", async (req, res) => {
-  res.send("Deleted Author " + req.params.id);
+  let author;
+  try {
+    const { id } = req.params;
+    author = await Author.findByIdAndDelete(id);
+    res.redirect("/authors");
+  } catch {
+    if (author == null) {
+      res.redirect(`/`);
+    } else {
+      res.redirect(`/authors/${author.id}`);
+    }
+  }
 });
+
+// router.get("/:id/books/new", async (req, res) => {
+//   const { id } = req.params;
+//   const author = await Author.findById(id);
+//   res.render("products/new", { author });
+// });
+
+// router.post("/:id/books", async (req, res) => {
+//   const { id } = req.params;
+//   const author = await Author.findById(id);
+//   const {
+//     title,
+//     description,
+//     publishDate,
+//     pageCount,
+//     createdAt,
+//     coverImage,
+//     coverImageType,
+//   } = req.body;
+//   const book = new Book({
+//     title,
+//     description,
+//     publishDate,
+//     pageCount,
+//     createdAt,
+//     coverImage,
+//     coverImageType,
+//   });
+//   author.books.push(book);
+//   book.author = author;
+//   await author.save();
+//   await book.save();
+//   res.redirect(`/authors/${id}`);
+// });
 
 module.exports = router;
