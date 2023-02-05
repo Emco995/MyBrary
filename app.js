@@ -11,11 +11,13 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 
+const dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/mybrary";
 mongoose.set("strictQuery", true);
-mongoose.connect("mongodb://127.0.0.1:27017/mybrary");
+// mongoose.connect("mongodb://127.0.0.1:27017/mybrary");
 main().catch((err) => console.log("MONGO DB ERROR", err));
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/mybrary");
+  // await mongoose.connect("mongodb://127.0.0.1:27017/mybrary");
+  await mongoose.connect(dbUrl);
   console.log("MONGO CONNECTION OPEN");
 }
 const db = mongoose.connection;
@@ -45,3 +47,4 @@ app.engine("ejs", ejsMate);
 app.listen(process.env.PORT || 3000, () => {
   console.log("WELCOME TO THE PORT 3000");
 });
+
